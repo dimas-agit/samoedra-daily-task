@@ -262,7 +262,21 @@ const [isAdminUser, setIsAdminUser] = useState(false);
               <div className="font-semibold text-gray-800">{userName}</div>
               <div className="text-sm text-gray-500 truncate">Caregiver</div>
             </div>
-
+              <div className="p-3">
+                {isAdminUser && (
+                  <a 
+                    href="/profile" 
+                    className="block py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
+                     onClick={(e) => {
+        e.preventDefault();
+        router.push("/report");
+         setDropdownOpen(false);
+      }}
+                  >
+                      📊 <span>Report</span>
+                  </a>
+                    )}
+              </div>
             {/* Logout */}
             <button
               onClick={handleLogout}
