@@ -8,75 +8,90 @@ import { connect } from "http2";
 import { randomUUID } from "crypto";
 import User from "@/app/models/User";
 import DaycareParticipant from "@/app/models/DaycareParticipant";
+const QUESTIONS = [
+  "Hadir Pukul 06.45",
+  "Mematikan lampu depan & menyalakan lampu dalam",
+  "Membalik tulisan buka tutup",
+  "Merapikan area daycare yang berantakan",
+  "Menyambut orang tua & menerima anak dengan ramah",
+  "Menanyakan kondisi anak",
+  "Menyiapkan sarapan peserta daycare",
+  "Menemani mandi",
+  "Menemani bermain",
+  "Merapikan barang bawaan peserta daycare",
+  "Menyiapkan kegiatan peserta daycare",
+  "Menyiapkan susu",
+  "Menyiapkan makan siang",
+  "Ibadah Sholat Zuhur",
+  "Menemani tidur siang",
+  "Menyiapkan snack",
+  "Menemani mandi sore",
+  "Menyisir & mengikat rambut",
+  "Merapikan pakaian kotor",
+  "Merapikan barang bawaan pulang",
+  "Mencatat laporan harian",
+  "Merapikan kamar & kasur daycare",
+  "Menemani main sore",
+  "Ibadah Sholat Ashar",
+  "Serah terima peserta daycare",
+];
+
 export async function GET(req: Request) {
-  try {
-    await connectToDatabase();
+  await connectToDatabase();
 
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
+  const date = searchParams.get("date");
+  const status = searchParams.get("status");
 
-    const date = searchParams.get("date");
-    const status = searchParams.get("status");
+  const query: any = {};
 
-    // ✅ default hari ini
-    const startDate = date
-      ? new Date(date)
-      : new Date(new Date().setHours(0, 0, 0, 0));
+  if (date) {
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setHours(23, 59, 59);
 
-    const endDate = new Date(startDate);
-    endDate.setHours(23, 59, 59, 999);
+    query.createdAt = { $gte: start, $lte: end };
+  }
 
-    const filter: any = {
-      createdAt: {
-        $gte: startDate,
-        $lte: endDate,
-      },
-    };
+  if (status) {
+    query.status = status;
+  }
 
-    if (status) {
-      filter.status = status;
-    }
+  const tasks = await Task.find(query).lean();
 
-    // 🔥 ambil task
-    const tasks = await Task.find(filter).sort({ createdAt: -1 });
+  const users = await User.find().lean();
+  const daycares = await DaycareParticipant.find().lean();
 
-    // 🔥 ambil semua user + daycare sekali (biar efisien)
-    const users = await User.find();
-    const participants = await DaycareParticipant.find();
+  const result = tasks.map((task: any) => {
+    const user = users.find(u => u._id.toString() === task.userId);
 
-    // 🔥 convert ke map biar cepat lookup
-    const userMap = new Map(users.map(u => [u._id.toString(), u]));
-    const participantMap = new Map(
-      participants.map(p => [p._id.toString(), p])
-    );
+    const participants = (task.daycareParticipantIds || [])
+      .map((id: string) => {
+        const d = daycares.find(x => x._id.toString() === id);
+        return d?.name;
+      })
+      .filter(Boolean)
+      .join(",");
 
-    // 🔥 mapping result
-    const result = tasks.map((task: any) => {
-      const user = userMap.get(task.userId);
-
-      const daycareNames = (task.daycareParticipantIds || [])
-        .map((id: string) => participantMap.get(id)?.name)
-        .filter(Boolean)
-        .join(", ");
-
+    // 🔥 mapping 25 soal
+    const details = QUESTIONS.map((q, i) => {
+      const idx = i + 1;
       return {
-        id: task._id,
-        userEmail: user?.email || task.userId || "-", // fallback
-        daycareParticipants: daycareNames || "-",
-        status: task.status,
-        date: task.createdAt,
+        no: idx,
+        question: q,
+        checked: task[`activity${idx}Checked`] || false,
+        note: task[`activity${idx}Note`] || "",
       };
     });
 
-    return Response.json({
-      success: true,
-      data: result,
-    });
+    return {
+      userEmail: user?.email || "-",
+      daycareParticipants: participants,
+      status: task.status,
+      date: task.createdAt,
+      details, // ✅ penting
+    };
+  });
 
-  } catch (error) {
-    console.error(error);
-    return Response.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
-  }
+  return Response.json({ data: result });
 }
