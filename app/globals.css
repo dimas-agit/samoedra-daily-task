@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.select2-container {
+  width: 100% !important;
+}
+
+/* INPUT BOX */
+.select2-selection--multiple {
+  min-height: 60px !important;
+  padding: 6px !important;
+
+  border: 2px solid #e5e7eb !important; /* gray-200 */
+  border-radius: 16px !important;
+
+  background: white !important;
+
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+
+  transition: all 0.3s ease !important;
+}
+
+/* FOCUS STATE */
+.select2-container--focus .select2-selection--multiple {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2) !important;
+}
+
+/* TAG CHIP */
+.select2-selection__choice {
+  background: linear-gradient(135deg, #a855f7, #ec4899) !important;
+  border: none !important;
+  color: white !important;
+
+  border-radius: 9999px !important;
+  padding: 4px 10px !important;
+
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* REMOVE ICON */
+.select2-selection__choice__remove {
+  color: white !important;
+  margin-right: 6px !important;
+}
+
+/* DROPDOWN */
+.select2-dropdown {
+  border-radius: 16px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12) !important;
+  overflow: hidden;
+}
+
+/* OPTION HOVER */
+.select2-results__option--highlighted {
+  background: #a855f7 !important;
+  color: white !important;
+}

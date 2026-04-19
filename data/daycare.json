@@ -1,0 +1,56 @@
+[
+  {
+    "_id":"08b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Shannel",
+    "age": 3,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Female"
+  },
+  {
+    "_id":"18b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Alma",
+    "age": 2,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Female"
+  },
+  {
+    "_id":"28b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Kaira",
+    "age": 2,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Female"
+  },
+  {
+    "_id":"38b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Caca",
+    "age": 2,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Female"
+  },
+  {
+    "_id":"48b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Kenzo",
+    "age": 2,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Male"
+  },
+  {
+    "_id":"58b9c8e-1c5a-4d0b-9f1e-2a7b6c8d9e0f",
+    "name": "Zea",
+    "age": 2,
+    "dateOfBirth": {
+      "$date": "2023-04-02T00:00:00.000Z"
+    },
+    "gender": "Female"
+  }
+]
