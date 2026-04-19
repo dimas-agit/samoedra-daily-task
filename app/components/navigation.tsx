@@ -11,7 +11,7 @@ export default function Navigation() {
   const [userName, setUserName] = useState("");
   const [taskCount, setTaskCount] = useState(0);
   const [loading, setLoading] = useState(true);
-
+const [isAdminUser, setIsAdminUser] = useState(false);
 
   const { isLoggedIn, logout } = useAuth();
   // Decode user dari token
@@ -35,9 +35,18 @@ export default function Navigation() {
           const res = await fetch(`/api/auth/user?id=${userId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
+          debugger;
+        
           if (res.ok) {
             const result = await res.json();
+              const email = result.existingUser.email;
+
+            const adminEmails = [
+            "admin@gmail.com",
+            "maidisamoedra@gmail.com",
+            ];
+
+            setIsAdminUser(adminEmails.includes(email));
             setUserName(result.existingUser.email?.split('@')[0] || "User");
           } else {
             setUserName(payload.name || payload.email?.split('@')[0] || "User");
@@ -186,13 +195,19 @@ export default function Navigation() {
                   <div className="text-sm text-gray-500">Caregiver</div>
                 </div>
                 <div className="py-2">
+                    {isAdminUser && (
                   <a 
                     href="/profile" 
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
-                    onClick={() => setDropdownOpen(false)}
+                     onClick={(e) => {
+        e.preventDefault();
+        router.push("/report");
+         setDropdownOpen(false);
+      }}
                   >
-                    Profile
+                      📊 <span>Report</span>
                   </a>
+                    )}
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all font-medium"

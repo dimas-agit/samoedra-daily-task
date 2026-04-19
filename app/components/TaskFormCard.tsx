@@ -1,7 +1,7 @@
 "use client";
 
 import { debug } from "console";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type DayCareParticipants = {
     _id:string,
@@ -71,7 +71,7 @@ type TaskForm = {
     status: string
 };
 export default function TaskFormCard() {
-
+    const selectRef = useRef<HTMLSelectElement | null>(null);   
     const [taskId, setTaskId] = useState<string | null>(null);
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
@@ -201,18 +201,10 @@ const getUserIdFromToken = (): string | null => {
         }
     };
     // State untuk selected participant ID
-    const [selectedParticipantId, setSelectedParticipantId] = useState<string>("");
+   const [selectedParticipantIds, setSelectedParticipantIds] = useState<string[]>([]);
 
     // Handler untuk select daycare participant
-    const handleParticipantChange = (participant: DayCareParticipants) => {
-        setSelectedParticipantId(participant._id.toString());
-
-        // Update taskData dengan daycareParticipantId
-        setTaskData(prev => ({
-            ...prev,
-            daycareParticipantId: participant._id  // Set ObjectId langsung
-        }));
-    };
+   
 
     const [tasks, setTasks] = useState([
         {
@@ -439,6 +431,44 @@ useEffect(() => {
     }, []);
 
 
+    useEffect(() => {
+  const init = () => {
+    if (typeof window === "undefined") return;
+
+    const $ = (window as any).$;
+
+    if (!$ || !selectRef.current) return;
+
+    // prevent double init
+    if ($.fn.select2 && $(selectRef.current).data("select2")) {
+      $(selectRef.current).select2("destroy");
+    }
+
+    $(selectRef.current).select2({
+      placeholder: "Pilih peserta",
+      width: "100%",
+    });
+
+    $(selectRef.current).on("change", (e: any) => {
+      const values = Array.from(e.target.selectedOptions).map(
+        (o: any) => o.value
+      );
+
+      setSelectedParticipantIds(values);
+    });
+  };
+
+  // delay biar script CDN ready
+  setTimeout(init, 300);
+
+  return () => {
+    const $ = (window as any).$;
+    if ($ && $.fn.select2 && selectRef.current) {
+      $(selectRef.current).select2("destroy");
+    }
+  };
+}, []);
+
   useEffect(() => {
   const savedTaskId = localStorage.getItem("taskId");
 
@@ -467,7 +497,7 @@ useEffect(() => {
       if (!task) return;
 
       // ✅ set state utama
-      setSelectedParticipantId(task.daycareParticipantId);
+      setSelectedParticipantIds(task.daycareParticipantIds || []);
       setStatus(task.status);
 
       // ✅ mapping ke UI checklist
@@ -520,7 +550,7 @@ useEffect(() => {
     }
 
     // VALIDASI
-    if (!selectedParticipantId) {
+    if (!selectedParticipantIds) {
       showPopupMessage('error', '👶 Silakan pilih peserta daycare!');
       return;
     }
@@ -531,7 +561,7 @@ useEffect(() => {
     const submitData = {
       id:taskId,
       userId,
-      daycareParticipantId: selectedParticipantId,
+      daycareParticipantIds: selectedParticipantIds,
       status: actionType === "save" ? "inprogress" : "completed",
       ...activitiesData, // ✅ Semua activity1-23 mapped otomatis!
     };
@@ -614,23 +644,24 @@ useEffect(() => {
                                 👶 Peserta Daycare
                             </label>
                             <select
+                                ref={selectRef}
+                                multiple
                                 className="w-full p-4 border-2 border-gray-200 rounded-2xl bg-white shadow-lg focus:ring-4 focus:ring-purple-200 focus:outline-none transition-all duration-300 hover:shadow-xl text-lg font-medium appearance-none"
-                                value={selectedParticipantId}
-                                onChange={(e) => {
-                                    const selectedId = e.target.value;
-                                    const selectedParticipant = daycareParticipants.find(p => p._id.toString() === selectedId);
+                                value={selectedParticipantIds}
+                               onChange={(e) => {
+                                const values = Array.from(
+                                    e.target.selectedOptions,
+                                    option => option.value
+                                );
 
-                                    if (selectedParticipant) {
-                                        handleParticipantChange(selectedParticipant);
-                                    }
+                                setSelectedParticipantIds(values);
                                 }}
-
                             >
-                                {daycareParticipants.map((participant: any) => (
-                                    <option key={participant._id} value={participant._id}>
-                                        {participant.name}
-                                    </option>
-                                ))}
+                                 {daycareParticipants.map((p) => (
+    <option key={p._id} value={p._id}>
+      {p.name}
+    </option>
+  ))}
                             </select>
                         </div>
                     </div>
