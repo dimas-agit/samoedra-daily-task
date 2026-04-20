@@ -470,6 +470,7 @@ useEffect(() => {
 }, []);
 
   useEffect(() => {
+    debugger;
   const savedTaskId = localStorage.getItem("taskId");
 
   if (!savedTaskId) return;
@@ -517,6 +518,29 @@ useEffect(() => {
   fetchDataTask(); // ✅ WAJIB dipanggil
 
 }, []);
+
+
+const resetForm = () => {
+  // reset participant
+  setSelectedParticipantIds([]);
+
+  // reset status
+  setStatus("not yet");
+
+  // reset checklist (25 task)
+  setTasks(prev =>
+    prev.map(t => ({
+      ...t,
+      isChecked: false,
+      note: "",
+    }))
+  );
+
+  // reset select2 UI (IMPORTANT kalau pakai select2)
+  if (selectRef.current && (window as any).$) {
+    (window as any).$(selectRef.current).val(null).trigger("change");
+  }
+};
   const handleSubmit = async (actionType: "save" | "submit") => {
   if (loading) return;
   
@@ -597,12 +621,12 @@ useEffect(() => {
     
     // Reset form jika submit
    if (actionType === "submit") {
-  localStorage.removeItem("taskId");
-  localStorage.removeItem("daycareTaskData");
-  localStorage.removeItem("daycareStatus");
+    localStorage.removeItem("taskId");
+    localStorage.removeItem("daycareTaskData");
+    localStorage.removeItem("daycareStatus");
 
-  setTaskId(null);
-}
+    resetForm();
+    }
     
     
   } catch (error: any) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Spinner from "@/app/components/spinner";
 import { useAuth } from "@/app/components/AuthProvider";
+import samoedra from "@/public/samoedra_logo.png";
 export default function LoginPage() {
   const router = useRouter();
  const { login } = useAuth();
@@ -61,8 +62,9 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
-        <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">
-          Samoedra Login
+        <img src={samoedra.src} className="h-11 md:h-13 mx-auto"/>
+        <h1 className="text-xl font-bold text-center mb-6 text-blue-400">
+          Login
         </h1>
 
         {error && (

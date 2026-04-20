@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { getUserIdFromToken } from "@/app/lib/auth"; // adjust path
 import { useAuth } from "./AuthProvider";
+import Loading from "../dashboard/loading";
 
 export default function Navigation() {
   const router = useRouter();
@@ -117,14 +118,6 @@ const [isAdminUser, setIsAdminUser] = useState(false);
       router.push("/auth/login");
   };
 
-
-  if (loading) {
-    return (
-      <nav className="p-4 bg-gradient-to-r from-blue-600 to-indigo-700">
-        <div className="animate-pulse bg-white/20 h-12 w-32 rounded-lg" />
-      </nav>
-    );
-  }
 
   if (!isLoggedIn) {
     return null; // ✅ Hide navigation jika belum login
