@@ -4,7 +4,7 @@ import { debug } from "console";
 import { useEffect, useRef, useState } from "react";
 
 type DayCareParticipants = {
-    _id:string,
+    _id: string,
     name: string;
     age: number;
     dateOfBirth: string
@@ -15,7 +15,7 @@ type PopupType = 'success' | 'error';
 
 
 type TaskForm = {
-    id:string,
+    id: string,
     userId: string;
     daycareParticipantIds: string[];
     activity1Checked: boolean,
@@ -66,22 +66,23 @@ type TaskForm = {
     activity23Note: string,
     activity24Checked: boolean,
     activity24Note: string,
-     activity25Checked: boolean,
+    activity25Checked: boolean,
     activity25Note: string,
     status: string
 };
 export default function TaskFormCard() {
-    const selectRef = useRef<HTMLSelectElement | null>(null);   
+    const selectRef = useRef<HTMLSelectElement | null>(null);
     const [taskId, setTaskId] = useState<string | null>(null);
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
     const [daycareParticipants, setDaycareParticipants] = useState<DayCareParticipants[]>([]);
     const [message, setMessage] = useState("");
     const [date, setDate] = useState(new Date());
+
     const [taskData, setTaskData] = useState<TaskForm>({
-        id:"" as string,
+        id: "" as string,
         userId: "" as string,
-        daycareParticipantIds:[],
+        daycareParticipantIds: [],
         activity1Checked: false,
         activity1Note: "",
         activity2Checked: false,
@@ -132,44 +133,45 @@ export default function TaskFormCard() {
         activity24Note: "",
         activity25Checked: false,
         activity25Note: "",
-        
+
         status: ""
     } as TaskForm);
 
 
-// TaskFormCard.tsx - Helper function
-const getUserIdFromToken = (): string | null => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-    
-    // Decode JWT payload (bagian 10gah)
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    
-    // Common JWT userId fields
-    return payload.userId || 
-           payload.sub || 
-           payload.id || 
-           payload._id ||
-           null;
-  } catch (error) {
-    console.error('Token decode error:', error);
-    return null;
-  }
-};
+
+    // TaskFormCard.tsx - Helper function
+    const getUserIdFromToken = (): string | null => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+
+            // Decode JWT payload (bagian 10gah)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            // Common JWT userId fields
+            return payload.userId ||
+                payload.sub ||
+                payload.id ||
+                payload._id ||
+                null;
+        } catch (error) {
+            console.error('Token decode error:', error);
+            return null;
+        }
+    };
     // Helper function - letakkan di dalam component
     const mapTasksToFormData = (): Record<string, any> => {
-    const formData: Record<string, any> = {};
-    
-    tasks.forEach((task) => {
-        const num = task.id;
-        
-        // Dynamic field names sesuai database
-        formData[`activity${num}Checked`] = task.isChecked;
-        formData[`activity${num}Note`] = task.note;
-    });
-    
-    return formData;
+        const formData: Record<string, any> = {};
+
+        tasks.forEach((task) => {
+            const num = task.id;
+
+            // Dynamic field names sesuai database
+            formData[`activity${num}Checked`] = task.isChecked;
+            formData[`activity${num}Note`] = task.note;
+        });
+
+        return formData;
     };
     // Popup states
     const [showPopup, setShowPopup] = useState(false);
@@ -201,10 +203,10 @@ const getUserIdFromToken = (): string | null => {
         }
     };
     // State untuk selected participant ID
-   const [selectedParticipantIds, setSelectedParticipantIds] = useState<string[]>([]);
+    const [selectedParticipantIds, setSelectedParticipantIds] = useState<string[]>([]);
 
     // Handler untuk select daycare participant
-   
+
 
     const [tasks, setTasks] = useState([
         {
@@ -285,7 +287,7 @@ const getUserIdFromToken = (): string | null => {
             isChecked: false,
             note: ''
         },
-          {
+        {
             id: 14,
             taskName: 'Ibadah Sholat Zuhur',
             isChecked: false,
@@ -317,7 +319,7 @@ const getUserIdFromToken = (): string | null => {
         },
         {
             id: 19,
-            taskName: 'Merapikan pakaian kotor',
+            taskName: 'Merapikan pakaian kotor & Mencuci piring peserta daycare',
             isChecked: false,
             note: ''
         },
@@ -335,7 +337,7 @@ const getUserIdFromToken = (): string | null => {
         },
         {
             id: 22,
-            taskName: 'Merapikan kamar & kasur daycare',
+            taskName: 'Membereskan kamar & kasur daycare dengan rapih',
             isChecked: false,
             note: ''
         },
@@ -345,7 +347,7 @@ const getUserIdFromToken = (): string | null => {
             isChecked: false,
             note: ''
         },
-         {
+        {
             id: 24,
             taskName: 'Ibadah Sholat Ashar',
             isChecked: false,
@@ -358,59 +360,75 @@ const getUserIdFromToken = (): string | null => {
             note: ''
         }
     ]);
-  const handleCheckboxChange = (id: number) => {
-  setTasks(prev => {
-    const updated = prev.map(task =>
-      task.id === id ? { ...task, isChecked: !task.isChecked } : task
-    );
-
-    // ✅ sync ke taskData
-    setTaskData(prevData => ({
-      ...prevData,
-      [`activity${id}Checked`]: updated.find(t => t.id === id)?.isChecked,
-    }));
-
-    return updated;
-  });
-};
-   const handleNoteChange = (id: number, value: string) => {
-  setTasks(prev => {
-    const updated = prev.map(task =>
-      task.id === id ? { ...task, note: value } : task
-    );
-
-    // ✅ sync ke taskData
-    setTaskData(prevData => ({
-      ...prevData,
-      [`activity${id}Note`]: value,
-    }));
-
-    return updated;
-  });
-};
 
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const tasksPerPage = 5;
+    // Data yang ditampilkan
+    // Hitung index
+    const indexOfLastTask = currentPage * tasksPerPage;
+    const indexOfFirstTask = indexOfLastTask - tasksPerPage;
 
-// ✅ Auto-save taskData
-useEffect(() => {
-  const savedTaskData = localStorage.getItem("daycareTaskData");
+    // Data yang ditampilkan
+    const paginatedTasks = tasks.slice(indexOfFirstTask, indexOfLastTask);
 
-  if (savedTaskData) {
-    const parsed = JSON.parse(savedTaskData);
+    // Total page
+    const totalPages = Math.ceil(tasks.length / tasksPerPage);
 
-    // ✅ restore taskData
-    setTaskData(parsed);
 
-    // ✅ IMPORTANT: mapping ke UI tasks
-    setTasks(prev =>
-      prev.map(task => ({
-        ...task,
-        isChecked: parsed[`activity${task.id}Checked`] || false,
-        note: parsed[`activity${task.id}Note`] || "",
-      }))
-    );
-  }
-}, []);
+    const handleCheckboxChange = (id: number) => {
+        setTasks(prev => {
+            const updated = prev.map(task =>
+                task.id === id ? { ...task, isChecked: !task.isChecked } : task
+            );
+
+            // ✅ sync ke taskData
+            setTaskData(prevData => ({
+                ...prevData,
+                [`activity${id}Checked`]: updated.find(t => t.id === id)?.isChecked,
+            }));
+
+            return updated;
+        });
+    };
+    const handleNoteChange = (id: number, value: string) => {
+        setTasks(prev => {
+            const updated = prev.map(task =>
+                task.id === id ? { ...task, note: value } : task
+            );
+
+            // ✅ sync ke taskData
+            setTaskData(prevData => ({
+                ...prevData,
+                [`activity${id}Note`]: value,
+            }));
+
+            return updated;
+        });
+    };
+
+
+
+    // ✅ Auto-save taskData
+    useEffect(() => {
+        const savedTaskData = localStorage.getItem("daycareTaskData");
+
+        if (savedTaskData) {
+            const parsed = JSON.parse(savedTaskData);
+
+            // ✅ restore taskData
+            setTaskData(parsed);
+
+            // ✅ IMPORTANT: mapping ke UI tasks
+            setTasks(prev =>
+                prev.map(task => ({
+                    ...task,
+                    isChecked: parsed[`activity${task.id}Checked`] || false,
+                    note: parsed[`activity${task.id}Note`] || "",
+                }))
+            );
+        }
+    }, []);
 
     useEffect(() => {
         const fetchDaycareParticipants = async () => {
@@ -432,210 +450,210 @@ useEffect(() => {
 
 
     useEffect(() => {
-  const init = () => {
-    if (typeof window === "undefined") return;
+        const init = () => {
+            if (typeof window === "undefined") return;
 
-    const $ = (window as any).$;
+            const $ = (window as any).$;
 
-    if (!$ || !selectRef.current) return;
+            if (!$ || !selectRef.current) return;
 
-    // prevent double init
-    if ($.fn.select2 && $(selectRef.current).data("select2")) {
-      $(selectRef.current).select2("destroy");
-    }
+            // prevent double init
+            if ($.fn.select2 && $(selectRef.current).data("select2")) {
+                $(selectRef.current).select2("destroy");
+            }
 
-    $(selectRef.current).select2({
-      placeholder: "Pilih peserta",
-      width: "100%",
-    });
+            $(selectRef.current).select2({
+                placeholder: "Pilih peserta",
+                width: "100%",
+            });
 
-    $(selectRef.current).on("change", (e: any) => {
-      const values = Array.from(e.target.selectedOptions).map(
-        (o: any) => o.value
-      );
+            $(selectRef.current).on("change", (e: any) => {
+                const values = Array.from(e.target.selectedOptions).map(
+                    (o: any) => o.value
+                );
 
-      setSelectedParticipantIds(values);
-    });
-  };
+                setSelectedParticipantIds(values);
+            });
+        };
 
-  // delay biar script CDN ready
-  setTimeout(init, 300);
+        // delay biar script CDN ready
+        setTimeout(init, 300);
 
-  return () => {
-    const $ = (window as any).$;
-    if ($ && $.fn.select2 && selectRef.current) {
-      $(selectRef.current).select2("destroy");
-    }
-  };
-}, []);
+        return () => {
+            const $ = (window as any).$;
+            if ($ && $.fn.select2 && selectRef.current) {
+                $(selectRef.current).select2("destroy");
+            }
+        };
+    }, []);
 
-  useEffect(() => {
-    debugger;
-  const savedTaskId = localStorage.getItem("taskId");
+    useEffect(() => {
+        debugger;
+        const savedTaskId = localStorage.getItem("taskId");
 
-  if (!savedTaskId) return;
+        if (!savedTaskId) return;
 
-  setTaskId(savedTaskId);
+        setTaskId(savedTaskId);
 
-  const fetchDataTask = async () => {
-    try {
-      const token = localStorage.getItem("token");
+        const fetchDataTask = async () => {
+            try {
+                const token = localStorage.getItem("token");
 
-      const res = await fetch(`/api/tasks/${savedTaskId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+                const res = await fetch(`/api/tasks/${savedTaskId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-      if (!res.ok) {
-        console.error("Task not found");
-        return;
-      }
+                if (!res.ok) {
+                    console.error("Task not found");
+                    return;
+                }
 
-      const result = await res.json(); // ✅ FIX (await)
-      const task = result.data;        // ✅ ambil dari data
+                const result = await res.json(); // ✅ FIX (await)
+                const task = result.data;        // ✅ ambil dari data
 
-      if (!task) return;
+                if (!task) return;
 
-      // ✅ set state utama
-      setSelectedParticipantIds(task.daycareParticipantIds || []);
-      setStatus(task.status);
+                // ✅ set state utama
+                setSelectedParticipantIds(task.daycareParticipantIds || []);
+                setStatus(task.status);
 
-      // ✅ mapping ke UI checklist
-      setTasks(prev =>
-        prev.map(t => ({
-          ...t,
-          isChecked: task[`activity${t.id}Checked`] || false,
-          note: task[`activity${t.id}Note`] || "",
-        }))
-      );
+                // ✅ mapping ke UI checklist
+                setTasks(prev =>
+                    prev.map(t => ({
+                        ...t,
+                        isChecked: task[`activity${t.id}Checked`] || false,
+                        note: task[`activity${t.id}Note`] || "",
+                    }))
+                );
 
-    } catch (error) {
-      console.error("Fetch task error:", error);
-    }
-  };
+            } catch (error) {
+                console.error("Fetch task error:", error);
+            }
+        };
 
-  fetchDataTask(); // ✅ WAJIB dipanggil
+        fetchDataTask(); // ✅ WAJIB dipanggil
 
-}, []);
+    }, []);
 
 
-const resetForm = () => {
-  // reset participant
-  setSelectedParticipantIds([]);
+    const resetForm = () => {
+        // reset participant
+        setSelectedParticipantIds([]);
 
-  // reset status
-  setStatus("not yet");
+        // reset status
+        setStatus("not yet");
 
-  // reset checklist (25 task)
-  setTasks(prev =>
-    prev.map(t => ({
-      ...t,
-      isChecked: false,
-      note: "",
-    }))
-  );
+        // reset checklist (25 task)
+        setTasks(prev =>
+            prev.map(t => ({
+                ...t,
+                isChecked: false,
+                note: "",
+            }))
+        );
 
-  // reset select2 UI (IMPORTANT kalau pakai select2)
-  if (selectRef.current && (window as any).$) {
-    (window as any).$(selectRef.current).val(null).trigger("change");
-  }
-};
-  const handleSubmit = async (actionType: "save" | "submit") => {
-  if (loading) return;
-  
-  setLoading(true);
-
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      showPopupMessage('error', '🔐 Silakan login terlebih dahulu!');
-      return;
-    }
-    debugger;
-    if(actionType === "save"){
-        setStatus(prev=>{
-            return "inprogress"
-        })
-    
-      
-    }
-    else{
-       setStatus(prev=>{
-            return "completed"
-        })
-    }
-    // Ambil userId dari token (adjust sesuai JWT structure)
-    const userId = getUserIdFromToken();
-    if (!userId) {
-      showPopupMessage('error', '🔐 User ID tidak ditemukan. Silakan login ulang!');
-      localStorage.removeItem("token");
-      return;
-    }
-
-    // VALIDASI
-    if (!selectedParticipantIds) {
-      showPopupMessage('error', '👶 Silakan pilih peserta daycare!');
-      return;
-    }
-
-    // Map tasks ke database format
-    const activitiesData = mapTasksToFormData();
-
-    const submitData = {
-      id:taskId,
-      userId,
-      daycareParticipantIds: selectedParticipantIds,
-      status: actionType === "save" ? "inprogress" : "completed",
-      ...activitiesData, // ✅ Semua activity1-23 mapped otomatis!
+        // reset select2 UI (IMPORTANT kalau pakai select2)
+        if (selectRef.current && (window as any).$) {
+            (window as any).$(selectRef.current).val(null).trigger("change");
+        }
     };
+    const handleSubmit = async (actionType: "save" | "submit") => {
+        if (loading) return;
 
-    console.log('Submitting data:', submitData);
+        setLoading(true);
 
-    const res = await fetch("/api/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(submitData),
-    });
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                showPopupMessage('error', '🔐 Silakan login terlebih dahulu!');
+                return;
+            }
+            debugger;
+            if (actionType === "save") {
+                setStatus(prev => {
+                    return "inprogress"
+                })
 
-    const result = await res.json();
 
-    if (result?.data?.id) {
-  setTaskId(result.data.id);
+            }
+            else {
+                setStatus(prev => {
+                    return "completed"
+                })
+            }
+            // Ambil userId dari token (adjust sesuai JWT structure)
+            const userId = getUserIdFromToken();
+            if (!userId) {
+                showPopupMessage('error', '🔐 User ID tidak ditemukan. Silakan login ulang!');
+                localStorage.removeItem("token");
+                return;
+            }
 
-  localStorage.setItem("taskId", result.data.id); // ✅ penting
-}
+            // VALIDASI
+            if (!selectedParticipantIds) {
+                showPopupMessage('error', '👶 Silakan pilih peserta daycare!');
+                return;
+            }
 
-    if (!res.ok) {
-      throw new Error(result.message || `HTTP ${res.status}`);
-    }
+            // Map tasks ke database format
+            const activitiesData = mapTasksToFormData();
 
-    const successMsg = actionType === "save" 
-      ? "💾 Draft tersimpan aman!" 
-      : "🎉 Semua task selesai! Terima kasih!";
-    
-    showPopupMessage('success', successMsg);
-    
-    // Reset form jika submit
-   if (actionType === "submit") {
-    localStorage.removeItem("taskId");
-    localStorage.removeItem("daycareTaskData");
-    localStorage.removeItem("daycareStatus");
+            const submitData = {
+                id: taskId,
+                userId,
+                daycareParticipantIds: selectedParticipantIds,
+                status: actionType === "save" ? "inprogress" : "completed",
+                ...activitiesData, // ✅ Semua activity1-23 mapped otomatis!
+            };
 
-    resetForm();
-    }
-    
-    
-  } catch (error: any) {
-    console.error('Submit error:', error);
-    showPopupMessage('error', error.message || 'Gagal mengirim data');
-  } finally {
-    setLoading(false);
-  }
-};
+            console.log('Submitting data:', submitData);
+
+            const res = await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(submitData),
+            });
+
+            const result = await res.json();
+
+            if (result?.data?.id) {
+                setTaskId(result.data.id);
+
+                localStorage.setItem("taskId", result.data.id); // ✅ penting
+            }
+
+            if (!res.ok) {
+                throw new Error(result.message || `HTTP ${res.status}`);
+            }
+
+            const successMsg = actionType === "save"
+                ? "💾 Draft tersimpan aman!"
+                : "🎉 Semua task selesai! Terima kasih!";
+
+            showPopupMessage('success', successMsg);
+
+            // Reset form jika submit
+            if (actionType === "submit") {
+                localStorage.removeItem("taskId");
+                localStorage.removeItem("daycareTaskData");
+                localStorage.removeItem("daycareStatus");
+
+                resetForm();
+            }
+
+
+        } catch (error: any) {
+            console.error('Submit error:', error);
+            showPopupMessage('error', error.message || 'Gagal mengirim data');
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-pink-50 to-purple-50 p-4 sm:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto">
@@ -672,20 +690,20 @@ const resetForm = () => {
                                 multiple
                                 className="w-full p-4 border-2 border-gray-200 rounded-2xl bg-white shadow-lg focus:ring-4 focus:ring-purple-200 focus:outline-none transition-all duration-300 hover:shadow-xl text-lg font-medium appearance-none"
                                 value={selectedParticipantIds}
-                               onChange={(e) => {
-                                const values = Array.from(
-                                    e.target.selectedOptions,
-                                    option => option.value
-                                );
+                                onChange={(e) => {
+                                    const values = Array.from(
+                                        e.target.selectedOptions,
+                                        option => option.value
+                                    );
 
-                                setSelectedParticipantIds(values);
+                                    setSelectedParticipantIds(values);
                                 }}
                             >
-                                 {daycareParticipants.map((p) => (
-    <option key={p._id} value={p._id}>
-      {p.name}
-    </option>
-  ))}
+                                {daycareParticipants.map((p) => (
+                                    <option key={p._id} value={p._id}>
+                                        {p.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -696,59 +714,55 @@ const resetForm = () => {
                 {/* Tasks - Card Style Responsive */}
                 <div className="space-y-4 mb-8">
 
-                    {tasks.map((task) => (
+                    {paginatedTasks.map((task) => (
                         <div
                             key={task.id}
-                            className="group bg-white/90 backdrop-blur-xl shadow-xl hover:shadow-2xl rounded-3xl p-6 border border-white/50 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]"
+                            className={`rounded-2xl px-4 py-3 border transition-all duration-200
+  ${task.isChecked
+                                    ? 'bg-blue-50 border-blue-200'
+                                    : 'bg-white border-gray-200'}
+  `}
                         >
-                            <div className="flex flex-col lg:flex-row lg:items-center lg:gap-6">
-                                {/* Task Number & Title - sama persis */}
-                                <div className="flex items-center gap-4 mb-6 lg:mb-0 lg:flex-1">
-                                    <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-purple-400 via-pink-400 to-orange-400 rounded-2xl flex items-center justify-center shadow-lg">
-                                        <span className="text-white font-bold text-xl drop-shadow-md">{task.id}</span>
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <h4 className="font-bold text-gray-900 text-md md:text-md leading-tight group-hover:text-purple-700 transition-colors">
-                                            {task.taskName}
-                                        </h4>
-                                    </div>
+                            {/* ROW 1 */}
+                            <div className="flex items-center gap-3">
+
+                                {/* Number */}
+                                <div className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold
+      ${task.isChecked
+                                        ? 'bg-blue-400 text-white'
+                                        : 'bg-purple-100 text-purple-600'}
+    `}>
+                                    {task.id}
                                 </div>
 
-                                {/* ✅ SIMPLE CHECKBOX - Kosong → Centang Hijau */}
-                                <div className="flex items-center justify-center mb-6 lg:mb-0 lg:w-24">
-                                    <label className="cursor-pointer p-3 transition-all duration-200 hover:scale-110">
-                                        <input
-                                            type="checkbox"
-                                            id={`task-${task.id}`}
-                                            checked={task.isChecked}
-                                            onChange={() => handleCheckboxChange(task.id)}
-                                            className="sr-only peer"
-                                        />
-                                        <div className={`
-                  w-14 h-14 rounded-2xl shadow-lg transition-all duration-300 ease-in-out
-                  border-4 border-gray-300
-                  peer-checked:border-green-500 peer-checked:bg-green-500
-                  peer-checked:shadow-green-300 peer-checked:shadow-xl
-                  hover:shadow-md hover:border-gray-400
-                  peer-focus:ring-4 peer-focus:ring-green-200
-                  group-hover:scale-105
-                  ${task.isChecked
-                                                ? 'scale-110 rotate-5'
-                                                : 'scale-100 rotate-0'
-                                            }
-                `}>
-                                            {/* Centang Hijau - Hanya muncul saat checked */}
+                                {/* Task */}
+                                <div className={`flex-1 text-sm leading-snug
+      ${task.isChecked
+                                        ? 'text-gray-500'
+                                        : 'text-gray-800'}
+    `}>
+                                    {task.taskName}
+                                </div>
+
+                                {/* Checkbox Custom (KANAN) */}
+                                <label className="cursor-pointer ml-auto">
+                                    <input
+                                        type="checkbox"
+                                        checked={task.isChecked}
+                                        onChange={() => handleCheckboxChange(task.id)}
+                                        className="hidden"
+                                    />
+
+                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200
+        ${task.isChecked
+                                            ? 'bg-blue-400'
+                                            : 'border-2 border-gray-300'}
+      `}>
+                                        {task.isChecked && (
                                             <svg
-                                                className={`
-                      w-7 h-7 mx-auto mt-1 transition-all duration-300 ease-in-out
-                      ${task.isChecked
-                                                        ? 'opacity-100 scale-100 translate-y-0 delay-150'
-                                                        : 'opacity-0 scale-75 -translate-y-2'
-                                                    }
-                    `}
+                                                className="w-4 h-4 text-white"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
-                                                style={{ color: '#ffff' }}
                                             >
                                                 <path
                                                     fillRule="evenodd"
@@ -756,24 +770,47 @@ const resetForm = () => {
                                                     clipRule="evenodd"
                                                 />
                                             </svg>
-                                        </div>
-                                    </label>
-                                </div>
+                                        )}
+                                    </div>
+                                </label>
+                            </div>
 
-                                {/* Note Input - sama persis */}
-                                <div className="flex-1 min-w-0">
-                                    <input
-                                        type="text"
-                                        id={`note-${task.id}`}
-                                        value={task.note}
-                                        onChange={(e) => handleNoteChange(task.id, e.target.value)}
-                                        className="w-full p-4 pl-12 border-2 border-gray-200 rounded-2xl bg-gradient-to-r from-white to-gray-50 shadow-inner focus:ring-4 focus:ring-purple-200 focus:outline-none transition-all duration-300 hover:shadow-md text-base placeholder-gray-400 font-medium"
-                                        placeholder="✍️ Catatan ..."
-                                    />
-                                </div>
+                            {/* NOTE */}
+                            <div className="mt-2">
+                                <input
+                                    type="text"
+                                    value={task.note}
+                                    onChange={(e) => handleNoteChange(task.id, e.target.value)}
+                                    placeholder="Tulis catatan jika ada 😊"
+                                    className="w-full text-sm px-3 py-2 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-green-200 outline-none"
+                                />
                             </div>
                         </div>
                     ))}
+
+                    <div className="flex justify-between items-center mt-6">
+
+                        <button
+                            onClick={() => setCurrentPage((prev) => prev - 1)}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 bg-gray-300 rounded-xl disabled:opacity-50 cursor-pointer"
+                        >
+                            ⬅ Previous
+                        </button>
+
+                        <span className="font-semibold">
+                            Page {currentPage} / {totalPages}
+                        </span>
+
+                        <button
+                            onClick={() => setCurrentPage((prev) => prev + 1)}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 bg-blue-400 text-white rounded-xl disabled:opacity-50 cursor-pointer"
+                        >
+                            Next ➡
+                        </button>
+
+                    </div>
                 </div>
 
                 {/* Action Buttons - sama persis */}
