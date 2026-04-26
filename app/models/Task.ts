@@ -56,6 +56,10 @@ const TaskSchema = new mongoose.Schema({
     activity22Note: { type: String, default: "" },
     activity23Checked: { type: Boolean, default: false },
     activity23Note: { type: String, default: "" },
+    activity24Checked: { type: Boolean, default: false },
+    activity24Note: { type: String, default: "" },
+    activity25Checked: { type: Boolean, default: false },
+    activity25Note: { type: String, default: "" },
     
     status: { 
       type: String, 
